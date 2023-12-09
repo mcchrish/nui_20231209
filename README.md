@@ -41,3 +41,5 @@
 ```bash
 npm test --workspace=server
 ```
+
+See [test file](https://github.com/mcchrish/nui_20231209/blob/main/server/tests/api.spec.ts) for all the tests.
