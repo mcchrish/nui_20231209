@@ -48,8 +48,11 @@ server.route({
         return {
           nextQuestion: {
             key: question[0],
-            title: question[1].title,
-            options: question[1].answers,
+            title: question[1].title[0],
+            options: Object.entries(question[1].answers).map((answer) => ({
+              result: answer[1].result,
+              title: answer[1].title,
+            })),
           },
         };
       }
@@ -66,9 +69,9 @@ server.route({
             type: "object",
             properties: {
               key: { type: "string" },
-              answer: { type: "string" },
+              result: { type: "string" },
             },
-            required: ["key", "answer"],
+            required: ["key", "result"],
           },
         },
       },
