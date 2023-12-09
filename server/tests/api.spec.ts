@@ -117,3 +117,71 @@ test("first question answered", async ({ request }) => {
     },
   });
 });
+
+test("all questions answered", async ({ request }) => {
+  const data = {
+    answers: [
+      {
+        key: "Arbeit",
+        result: "0",
+      },
+      {
+        key: "Bayern",
+        result: "BE",
+      },
+      {
+        key: "Beschwerden",
+        result: "nein",
+      },
+      {
+        key: "Beziehung",
+        result: "FA",
+      },
+      {
+        key: "Dauer",
+        result: "kurz",
+      },
+      {
+        key: "Erkrankung",
+        result: "ja",
+      },
+      {
+        key: "Kurs",
+        result: "ja",
+      },
+      {
+        key: "Landespflegegeld",
+        result: "nein",
+      },
+      {
+        key: "Ort",
+        result: "zuhause",
+      },
+      {
+        key: "Pflegegrad",
+        result: "2",
+      },
+      {
+        key: "Pfleger",
+        result: "alleine",
+      },
+      {
+        key: "Situation",
+        result: "alleine",
+      },
+    ],
+  };
+  const res = await request.post("/next-question", { data });
+  expect(res.ok()).toBeTruthy();
+  expect(await res.json()).toEqual({
+    services: [
+      "-MK_rgDtGHwJmu0Kf8XI",
+      "-NRrLlKi1U6P3lAuWFkN",
+      "D",
+      "E",
+      "K",
+      "L",
+      "M",
+    ],
+  });
+});

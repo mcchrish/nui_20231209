@@ -1,48 +1,29 @@
 import cors from "@fastify/cors";
 import { JsonSchemaToTsProvider } from "@fastify/type-provider-json-schema-to-ts";
 import fastify from "fastify";
+import { isQuestionData } from "./is-question-data.js";
+import { resolveServices } from "./resolve-services.js";
 
 const server = fastify().withTypeProvider<JsonSchemaToTsProvider>();
 await server.register(cors, {});
-
-export function isQuestionData(data: unknown): data is QuestionData {
-  return typeof data === "object" && data !== null && "questions" in data;
-}
-
-interface Question {
-  answers: Record<string, Answer>;
-  title: string[];
-  title_alt: string[];
-}
-
-interface Answer {
-  result: string;
-  title: string;
-  title_alt: string;
-}
-
-interface QuestionData {
-  questions: Record<string, Question>;
-  topics: Record<string, { rule: string; title: Record<string, string> }>;
-}
 
 server.route({
   method: "POST",
   url: "/next-question",
   async handler(request) {
-    const { answers } = request.body;
     const res = await fetch(
       "https://nui-testchallenge-default-rtdb.europe-west1.firebasedatabase.app/services_backend.json",
     );
     const data = await res.json();
-
     if (!isQuestionData(data)) {
       throw new Error("Invalid data");
     }
 
     const questions = Object.entries(data.questions);
+    const { answers } = request.body;
     const answeredKeys = answers.map((answer) => answer.key);
 
+    // Resolve the next question
     for (const question of questions) {
       if (!answeredKeys.includes(question[0])) {
         return {
@@ -57,7 +38,9 @@ server.route({
         };
       }
     }
-    return { services: [] };
+
+    // If no more next question, resolve the services
+    return { services: resolveServices(answers, data.topics) };
   },
   schema: {
     body: {
